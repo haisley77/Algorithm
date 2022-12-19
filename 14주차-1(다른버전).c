@@ -1,58 +1,57 @@
-/*
 #include <stdio.h>
 #include <stdlib.h>
 #pragma warning (disable:4996)
 
 typedef struct inode {
-	int edge;						// edge ÀÎµ¦½º
-	struct inode* next;				// ´ÙÀ½ ÀÎÁ¢ edge
+	int edge;						// edge ì¸ë±ìŠ¤
+	struct inode* next;				// ë‹¤ìŒ ì¸ì ‘ edge
 } Inode;
 
 typedef struct dnode {
-	int v;							// Á¤Á¡ ÀÎµ¦½º
-	int dist;						// ½Ç½Ã°£ ÃÖ´Ü °Å¸®
+	int v;							// ì •ì  ì¸ë±ìŠ¤
+	int dist;						// ì‹¤ì‹œê°„ ìµœë‹¨ ê±°ë¦¬
 } Dnode;
 
 typedef struct vertex {
-	int distindex;					// Å¥ ÀÎµ¦½º
-	int state;						// ÃÖ´Ü °Å¸® È®Á¤ ¿©ºÎ
-	struct inode* in;				// ÀÎÁ¢¸®½ºÆ® Çì´õ
+	int distindex;					// í ì¸ë±ìŠ¤
+	int state;						// ìµœë‹¨ ê±°ë¦¬ í™•ì • ì—¬ë¶€
+	struct inode* in;				// ì¸ì ‘ë¦¬ìŠ¤íŠ¸ í—¤ë”
 } Vertex;
 
 typedef struct edge {
-	int v1;						// Á¤Á¡ 1 ÀÎµ¦½º
-	int v2;						// Á¤Á¡ 2 ÀÎµ¦½º
-	int w;						// °Å¸® 
+	int v1;						// ì •ì  1 ì¸ë±ìŠ¤
+	int v2;						// ì •ì  2 ì¸ë±ìŠ¤
+	int w;						// ê±°ë¦¬ 
 } Edge;
 
 
 int INF = 30000;
 int n, m, s;
-// °£¼±¸®½ºÆ®
+// ê°„ì„ ë¦¬ìŠ¤íŠ¸
 Edge** E;
-// Á¤Á¡¸®½ºÆ®
+// ì •ì ë¦¬ìŠ¤íŠ¸
 Vertex** V;
-// ¿ì¼±¼øÀ§Å¥
+// ìš°ì„ ìˆœìœ„í
 Dnode** Q;
-// ÃÖ´Ü°Å¸® ÀúÀå ¸®½ºÆ®
+// ìµœë‹¨ê±°ë¦¬ ì €ì¥ ë¦¬ìŠ¤íŠ¸
 int* D;
 
-// ±×·¡ÇÁ ÇÔ¼ö
+// ê·¸ë˜í”„ í•¨ìˆ˜
 void insertVertex(int i);
 void insertEdge(int i, int v1, int v2, int w);
 int opposite(int u, Inode* e);
 
-// ¿ì¼±¼øÀ§Å¥(Èü) ÇÔ¼ö
+// ìš°ì„ ìˆœìœ„í(í™) í•¨ìˆ˜
 void downHeap(int i);
 void rBuildHeap(int i);
 int removeMin();
 int isEmpty();
 void replaceKey(int z, int d);
 
-// ´ÙÀÍ½ºÆ®¶ó ¾Ë°í¸®Áò
+// ë‹¤ìµìŠ¤íŠ¸ë¼ ì•Œê³ ë¦¬ì¦˜
 void DijkstraShortestPaths();
 
-// ¸Ş¸ğ¸® ÇØÁ¦ ÇÔ¼ö
+// ë©”ëª¨ë¦¬ í•´ì œ í•¨ìˆ˜
 void freememory();
 
 void main() {
@@ -63,14 +62,14 @@ void main() {
 	getchar();
 
 	
-	// Á¤Á¡ ¸®½ºÆ® ÃÊ±âÈ­
+	// ì •ì  ë¦¬ìŠ¤íŠ¸ ì´ˆê¸°í™”
 	V = (Vertex**)malloc(sizeof(Vertex*) * n);
 	for (int i = 0; i < n; i++) {
 		
 		insertVertex(i);
 	}
 
-	// °£¼± ¸®½ºÆ® ÃÊ±âÈ­
+	// ê°„ì„  ë¦¬ìŠ¤íŠ¸ ì´ˆê¸°í™”
 	E = (Edge**)malloc(sizeof(Edge*) * m);
 	for (int i = 0; i < m; i++) {
 		scanf("%d%d%d", &v1, &v2, &w);
@@ -78,12 +77,12 @@ void main() {
 		insertEdge(i, v1, v2, w);
 	}
 
-	// ÃÖ´Ü°Å¸® ÀúÀå ¸®½ºÆ® ÃÊ±âÈ­
+	// ìµœë‹¨ê±°ë¦¬ ì €ì¥ ë¦¬ìŠ¤íŠ¸ ì´ˆê¸°í™”
 	D = (int*)malloc(sizeof(int) * n);
 	for (int i = 0; i < n; i++) {
 		D[i] = INF;
 	}
-	// ¿ì¼±¼øÀ§Å¥ ÃÊ±âÈ­
+	// ìš°ì„ ìˆœìœ„í ì´ˆê¸°í™”
 	Q = (Dnode**)malloc(sizeof(Dnode) * (n + 1));
 	for (int i = 0; i <= n; i++) {
 		Q[i] = (Dnode*)malloc(sizeof(Dnode));
@@ -91,7 +90,7 @@ void main() {
 		Q[i]->v = i - 1;
 	}
 
-	// ´ÙÀÍ½ºÆ®¶ó ÃÖ´Ü °æ·Î Å½»ö
+	// ë‹¤ìµìŠ¤íŠ¸ë¼ ìµœë‹¨ ê²½ë¡œ íƒìƒ‰
 	DijkstraShortestPaths();
 
 	freememory();
@@ -101,30 +100,30 @@ void main() {
 
 void insertVertex(int i) {
 	V[i] = (Vertex*)malloc(sizeof(Vertex));
-	// °æ·Î Æ÷ÇÔ ¿©ºÎ
+	// ê²½ë¡œ í¬í•¨ ì—¬ë¶€
 	V[i]->state = 0;
-	// ÀÎÁ¢¸®½ºÆ® Çì´õ
+	// ì¸ì ‘ë¦¬ìŠ¤íŠ¸ í—¤ë”
 	V[i]->in = (Inode*)malloc(sizeof(Inode));
 	V[i]->in->next = NULL;
-	// Á¤Á¡ÀÇ ¿ì¼±¼øÀ§Å¥ ÃÖ´Ü°Å¸® ÀúÀå ÀÎµ¦½º
+	// ì •ì ì˜ ìš°ì„ ìˆœìœ„í ìµœë‹¨ê±°ë¦¬ ì €ì¥ ì¸ë±ìŠ¤
 	V[i]->distindex = i + 1;
 
 }
 
 void insertEdge(int i, int v1, int v2, int w) {
-	// °£¼± »ı¼º
+	// ê°„ì„  ìƒì„±
 	E[i] = (Edge*)malloc(sizeof(Edge));
 	E[i]->v1 = v1 - 1;
 	E[i]->v2 = v2 - 1;
 	E[i]->w = w;
 
-	// v1 Á¤Á¡ ÀÎÁ¢¸®½ºÆ® Ãß°¡
+	// v1 ì •ì  ì¸ì ‘ë¦¬ìŠ¤íŠ¸ ì¶”ê°€
 	Inode* node1 = (Inode*)malloc(sizeof(Inode));
 	node1->edge = i;
 	node1->next = V[v1 - 1]->in->next;
 	V[v1 - 1]->in->next = node1;
 
-	// v2 Á¤Á¡ ÀÎÁ¢¸®½ºÆ® Ãß°¡
+	// v2 ì •ì  ì¸ì ‘ë¦¬ìŠ¤íŠ¸ ì¶”ê°€
 	Inode* node2 = (Inode*)malloc(sizeof(Inode));
 	node2->edge = i;
 	node2->next = V[v2 - 1]->in->next;
@@ -143,10 +142,10 @@ void downHeap(int i) {
 	if (right <= n) {
 		if (Q[left]->dist > Q[right]->dist) {
 			if (Q[right]->dist < Q[i]->dist) {
-				// Á¤Á¡ÀÇ ¿ì¼±¼øÀ§Å¥ ÃÖ´Ü°Å¸® ÀúÀå ÀÎµ¦½º ¼öÁ¤
+				// ì •ì ì˜ ìš°ì„ ìˆœìœ„í ìµœë‹¨ê±°ë¦¬ ì €ì¥ ì¸ë±ìŠ¤ ìˆ˜ì •
 				V[Q[i]->v]->distindex = right;
 
-				// ¿ì¼±¼øÀ§Å¥ ¿ø¼Ò swap
+				// ìš°ì„ ìˆœìœ„í ì›ì†Œ swap
 				tmp = Q[i];
 				Q[i] = Q[right];
 				Q[right] = tmp;
@@ -183,7 +182,7 @@ void downHeap(int i) {
 	else return;
 }
 
-// »óÇâ½Ä ÃÖ¼Ò Èü ±¸Çö
+// ìƒí–¥ì‹ ìµœì†Œ í™ êµ¬í˜„
 void rBuildHeap(int i) {
 	if (i <= n) {
 		rBuildHeap(2 * i);
@@ -193,7 +192,7 @@ void rBuildHeap(int i) {
 }
 
 void replaceKey(int z, int d) {
-	// ¿ì¼±¼øÀ§Å¥ ÃÖ´Ü°Å¸® ¼öÁ¤
+	// ìš°ì„ ìˆœìœ„í ìµœë‹¨ê±°ë¦¬ ìˆ˜ì •
 	Q[V[z]->distindex]->dist = d;
 }
 
@@ -201,7 +200,7 @@ int isEmpty() {
 	return (Q[1]->dist == INF);
 }
 
-// ¿ì¼±¼øÀ§Å¥¿¡¼­ min °ª ¹İÈ¯
+// ìš°ì„ ìˆœìœ„íì—ì„œ min ê°’ ë°˜í™˜
 int removeMin() {
 	int v = Q[1]->v;
 	if (Q[1]->dist == INF) {
@@ -230,7 +229,7 @@ void DijkstraShortestPaths() {
 	int u;
 	Inode* e;
 
-	// Ãâ¹ß Á¤Á¡ ÃÖ´Ü°Å¸® ¼³Á¤
+	// ì¶œë°œ ì •ì  ìµœë‹¨ê±°ë¦¬ ì„¤ì •
 	Q[s]->dist = 0;
 	D[s - 1] = 0;
 	rBuildHeap(1);
@@ -239,10 +238,10 @@ void DijkstraShortestPaths() {
 	while (!isEmpty()) {
 
 		u = removeMin();
-		// Á¤Á¡ÀÇ ÃÖ´Ü°Å¸® È®Á¤ ¿©ºÎ ¼öÁ¤
+		// ì •ì ì˜ ìµœë‹¨ê±°ë¦¬ í™•ì • ì—¬ë¶€ ìˆ˜ì •
 		V[u]->state = 1;
 
-		// Á¤Á¡ÀÇ ¸ğµç ºÎÂø°£¼±¿¡ ´ëÇØ¼­ ½ÇÇà
+		// ì •ì ì˜ ëª¨ë“  ë¶€ì°©ê°„ì„ ì— ëŒ€í•´ì„œ ì‹¤í–‰
 		e = V[u]->in->next;
 		while (e != NULL) {
 			int z = opposite(u, e);
@@ -254,13 +253,13 @@ void DijkstraShortestPaths() {
 			}
 			e = e->next;
 		}
-		// replaceKey ÀÛ¾÷ ÈÄ ÃÖ¼Ò Èü º¸Á¤
+		// replaceKey ì‘ì—… í›„ ìµœì†Œ í™ ë³´ì •
 		rBuildHeap(1);
 
 		
 	}
 
-	// ÃÖ´Ü°Å¸® Á¤º¸ Ãâ·Â
+	// ìµœë‹¨ê±°ë¦¬ ì •ë³´ ì¶œë ¥
 	for (int i = 0; i < n; i++) {
 		if (i == s - 1 || D[i] == INF) {
 			continue;
@@ -299,4 +298,3 @@ void freememory() {
 
 	free(D);
 }
-*/
